@@ -12,7 +12,7 @@ cd $(dirname $0)/../package
 TAG=${TAG:-${VERSION}${SUFFIX}}
 REPO=${REPO:-rancher}
 
-cp ../bin/healthcheck .
+cp ../bin/healthcheck ../pkg/haproxy/haproxy_reload.sh ../pkg/haproxy/haproxy_template.cfg .
 docker build -t ${REPO}/healthcheck:${TAG} .
 
 echo Built ${REPO}/healthcheck:${TAG}
