@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+func init() {
+	logrus.SetOutput(os.Stdout)
+}
+
 func main() {
 	err := Poll()
 	if err != nil {
