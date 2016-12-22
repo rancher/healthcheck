@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM rancher/agent-base:v0.3.0
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -17,6 +17,6 @@ COPY haproxy_template.cfg /etc/haproxy/haproxy_template.cfg
 ENV TINI_VERSION v0.10.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
+ENTRYPOINT ["/rancher-entrypoint.sh", "/tini", "--"]
 
 CMD ["healthcheck"]
