@@ -16,10 +16,6 @@ type Poller struct {
 	MetaFetcher Fetcher
 }
 
-const (
-	metadataURL = "http://rancher-metadata/2015-12-19"
-)
-
 type Fetcher interface {
 	OnChange(intervalSeconds int, do func(string))
 	GetServices() ([]metadata.Service, error)
@@ -42,7 +38,7 @@ func (p *Poller) OnChange(do func(string)) {
 	p.MetaFetcher.OnChange(5, do)
 }
 
-func (p *Poller) Init() error {
+func (p *Poller) Init(metadataURL string) error {
 	metadataClient, err := metadata.NewClientAndWait(metadataURL)
 	if err != nil {
 		return err
