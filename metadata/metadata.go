@@ -20,6 +20,7 @@ type Fetcher interface {
 	OnChange(intervalSeconds int, do func(string))
 	GetServices() ([]metadata.Service, error)
 	GetSelfHost() (metadata.Host, error)
+	GetContainers() ([]metadata.Container, error)
 }
 
 func (mf RMetaFetcher) OnChange(intervalSeconds int, do func(string)) {
@@ -28,6 +29,10 @@ func (mf RMetaFetcher) OnChange(intervalSeconds int, do func(string)) {
 
 func (mf RMetaFetcher) GetServices() ([]metadata.Service, error) {
 	return mf.metadataClient.GetServices()
+}
+
+func (mf RMetaFetcher) GetContainers() ([]metadata.Container, error) {
+	return mf.metadataClient.GetContainers()
 }
 
 func (mf RMetaFetcher) GetSelfHost() (metadata.Host, error) {
@@ -55,44 +60,26 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 	if err != nil {
 		return nil, err
 	}
-
-	host, err := p.MetaFetcher.GetSelfHost()
+	cs, err := p.MetaFetcher.GetContainers()
+	if err != nil {
+		return nil, err
+	}
+	selfHost, err := p.MetaFetcher.GetSelfHost()
 	if err != nil {
 		return nil, err
 	}
 	var ses []types.Service
+	// process services
 	for _, svc := range svcs {
 		if svc.HealthCheck.Port == 0 {
 			continue
 		}
-
 		var servers []types.Server
 		for _, c := range svc.Containers {
-			if c.PrimaryIp == "" {
-				continue
-			}
-			if !(strings.EqualFold(c.State, "running") || strings.EqualFold(c.State, "starting")) {
-				continue
-			}
-			//only configure on the host
-			// when container health checkers contain host id
-			skipCheck := true
-			for _, hostUUID := range c.HealthCheckHosts {
-				if strings.EqualFold(host.UUID, hostUUID) {
-					skipCheck = false
-					break
-				}
-			}
-			if skipCheck {
-				logrus.Debugf("Health check for container [%s] is not configured on this host, skipping", c.Name)
-				continue
-			}
-
-			srvr := types.Server{
-				UUID:    fmt.Sprintf("cattle-%s_%s_%v", host.UUID, c.UUID, c.StartCount),
-				Address: c.PrimaryIp,
-			}
-			servers = append(servers, srvr)
+			addServer(&c, &servers, &selfHost)
+		}
+		if len(servers) == 0 {
+			continue
 		}
 		s := types.Service{
 			UUID:        svc.UUID,
@@ -101,5 +88,50 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 		}
 		ses = append(ses, s)
 	}
+	// process standalone containers
+	for _, c := range cs {
+		if c.ServiceName != "" || c.HealthCheck.Port == 0 {
+			continue
+		}
+		var servers []types.Server
+		addServer(&c, &servers, &selfHost)
+		if len(servers) == 0 {
+			continue
+		}
+		s := types.Service{
+			UUID:        c.UUID,
+			HealthCheck: c.HealthCheck,
+			Servers:     servers,
+		}
+		ses = append(ses, s)
+	}
 	return ses, nil
+}
+
+func addServer(c *metadata.Container, servers *[]types.Server, selfHost *metadata.Host) {
+	if c.PrimaryIp == "" {
+		return
+	}
+	if !(strings.EqualFold(c.State, "running") || strings.EqualFold(c.State, "starting")) {
+		return
+	}
+	//only configure on the host
+	// when container health checkers contain host id
+	skipCheck := true
+	for _, hostUUID := range c.HealthCheckHosts {
+		if strings.EqualFold(selfHost.UUID, hostUUID) {
+			skipCheck = false
+			break
+		}
+	}
+	if skipCheck {
+		logrus.Debugf("Health check for container [%s] is not configured on this host, skipping", c.Name)
+		return
+	}
+
+	srvr := types.Server{
+		UUID:    fmt.Sprintf("cattle-%s_%s_%v", selfHost.UUID, c.UUID, c.StartCount),
+		Address: c.PrimaryIp,
+	}
+	*servers = append(*servers, srvr)
 }
