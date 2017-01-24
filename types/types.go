@@ -18,7 +18,7 @@ type Server struct {
 type MetadataPoller interface {
 	GetHealthCheckServices() (services []Service, err error)
 	OnChange(do func(string))
-	Init() error
+	Init(string) error
 }
 
 type ConfigUpdater interface {

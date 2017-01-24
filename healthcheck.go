@@ -17,7 +17,7 @@ var Prefix = "cattle-"
 var ServerName = "svname"
 var Status = "status"
 
-func Poll() error {
+func Poll(metadataURL string) error {
 	client, err := util.GetRancherClient()
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func Poll() error {
 	}
 
 	metadataPoller := &metadata.Poller{}
-	if err = metadataPoller.Init(); err != nil {
+	if err = metadataPoller.Init(metadataURL); err != nil {
 		return err
 	}
 
