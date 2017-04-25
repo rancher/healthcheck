@@ -13,6 +13,8 @@ TAG=${TAG:-${VERSION}${SUFFIX}}
 REPO=${REPO:-rancher}
 
 cp ../bin/healthcheck ../pkg/haproxy/haproxy_reload.sh ../pkg/haproxy/haproxy_template.cfg .
-docker build -t ${REPO}/healthcheck:${TAG} .
 
-echo Built ${REPO}/healthcheck:${TAG}
+IMAGE=${REPO}/healthcheck:${TAG}
+docker build -t ${IMAGE} .
+echo ${IMAGE} > ../dist/images
+echo Built ${IMAGE}
