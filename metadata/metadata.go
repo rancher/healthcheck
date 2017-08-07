@@ -2,10 +2,11 @@ package metadata
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/rancher/go-rancher-metadata/metadata"
 	"github.com/rancher/healthcheck/types"
-	"strings"
 )
 
 type RMetaFetcher struct {
@@ -70,12 +71,22 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 	}
 	var ses []types.Service
 	// process services
+	uuidToPrimaryIP := make(map[string]string)
 	for _, svc := range svcs {
 		if svc.HealthCheck.Port == 0 {
 			continue
 		}
+		for _, c := range svc.Containers {
+			if c.PrimaryIp == "" {
+				continue
+			}
+			uuidToPrimaryIP[c.UUID] = c.PrimaryIp
+		}
 		var servers []types.Server
 		for _, c := range svc.Containers {
+			if c.PrimaryIp == "" && c.NetworkFromContainerUUID != "" {
+				c.PrimaryIp = uuidToPrimaryIP[c.NetworkFromContainerUUID]
+			}
 			addServer(&c, &servers, &selfHost)
 		}
 		if len(servers) == 0 {
