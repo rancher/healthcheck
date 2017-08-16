@@ -73,14 +73,16 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 	// process services
 	uuidToPrimaryIP := make(map[string]string)
 	for _, svc := range svcs {
-		if svc.HealthCheck.Port == 0 {
-			continue
-		}
 		for _, c := range svc.Containers {
 			if c.PrimaryIp == "" {
 				continue
 			}
 			uuidToPrimaryIP[c.UUID] = c.PrimaryIp
+		}
+	}
+	for _, svc := range svcs {
+		if svc.HealthCheck.Port == 0 {
+			continue
 		}
 		var servers []types.Server
 		for _, c := range svc.Containers {
