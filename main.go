@@ -12,6 +12,10 @@ var (
 	metadataAddress = flag.String("metadata-address", "rancher-metadata", "The metadata service address")
 )
 
+func init() {
+	logrus.SetOutput(os.Stdout)
+}
+
 func main() {
 	flag.Parse()
 	err := Poll(fmt.Sprintf("http://%s/2015-12-19", *metadataAddress))
