@@ -84,22 +84,23 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 		if svc.HealthCheck.Port == 0 {
 			continue
 		}
-		var servers []types.Server
+
 		for _, c := range svc.Containers {
+			var servers []types.Server
 			if c.PrimaryIp == "" && c.NetworkFromContainerUUID != "" {
 				c.PrimaryIp = uuidToPrimaryIP[c.NetworkFromContainerUUID]
 			}
 			addServer(&c, &servers, &selfHost)
+			if len(servers) == 0 {
+				continue
+			}
+			s := types.Service{
+				UUID:        svc.UUID,
+				HealthCheck: svc.HealthCheck,
+				Servers:     servers,
+			}
+			ses = append(ses, s)
 		}
-		if len(servers) == 0 {
-			continue
-		}
-		s := types.Service{
-			UUID:        svc.UUID,
-			HealthCheck: svc.HealthCheck,
-			Servers:     servers,
-		}
-		ses = append(ses, s)
 	}
 	// process standalone containers
 	for _, c := range cs {
