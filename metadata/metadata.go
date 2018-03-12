@@ -95,8 +95,8 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 				continue
 			}
 			s := types.Service{
-				UUID:        svc.UUID,
-				HealthCheck: svc.HealthCheck,
+				UUID:        c.UUID,
+				HealthCheck: c.HealthCheck,
 				Servers:     servers,
 			}
 			ses = append(ses, s)
