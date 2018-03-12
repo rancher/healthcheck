@@ -53,10 +53,7 @@ func (p *Provider) Start() error {
 		Name:      "healthCheck",
 	}
 	// start haproxy
-	if err := p.applyHaproxyConfig(nil, false); err != nil {
-		return err
-	}
-	return nil
+	return p.applyHaproxyConfig(nil, false)
 }
 
 func (p *Provider) ApplyConfig(string) {
