@@ -94,9 +94,15 @@ func (p *Poller) GetHealthCheckServices() (services []types.Service, err error) 
 			if len(servers) == 0 {
 				continue
 			}
+			var hc metadata.HealthCheck
+			if c.HealthCheck.Port != 0 {
+				hc = c.HealthCheck
+			} else {
+				hc = svc.HealthCheck
+			}
 			s := types.Service{
 				UUID:        c.UUID,
-				HealthCheck: c.HealthCheck,
+				HealthCheck: hc,
 				Servers:     servers,
 			}
 			ses = append(ses, s)
