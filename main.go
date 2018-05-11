@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/leodotcloud/log"
+	logserver "github.com/leodotcloud/log/server"
 )
 
 var (
@@ -13,10 +14,11 @@ var (
 )
 
 func main() {
+	logserver.StartServerWithDefaults()
 	flag.Parse()
 	err := Poll(fmt.Sprintf("http://%s/2015-12-19", *metadataAddress))
 	if err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 	os.Exit(0)
 }

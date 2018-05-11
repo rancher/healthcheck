@@ -2,14 +2,15 @@ package haproxy
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/rancher/healthcheck/types"
 	"io"
 	"os"
 	"os/exec"
 	"sort"
 	"strings"
 	"text/template"
+
+	"github.com/leodotcloud/log"
+	"github.com/rancher/healthcheck/types"
 )
 
 type Provider struct {
@@ -43,7 +44,7 @@ type haproxyConfigBuilder struct {
 type Backends []*Backend
 
 func (p *Provider) Start() error {
-	logrus.Info("Starting haproxy listener")
+	log.Info("Starting haproxy listener")
 
 	p.builder = &haproxyConfigBuilder{
 		ReloadCmd: "haproxy_reload.sh /etc/haproxy/haproxy.cfg reload",
@@ -57,14 +58,14 @@ func (p *Provider) Start() error {
 }
 
 func (p *Provider) ApplyConfig(string) {
-	logrus.Info("Scheduling apply config")
+	log.Info("Scheduling apply config")
 	bes, err := p.buildConfig()
 	if err != nil {
-		logrus.Errorf("Failed to build haproxy config: %v", err)
+		log.Errorf("Failed to build haproxy config: %v", err)
 	}
 	err = p.applyHaproxyConfig(bes, true)
 	if err != nil {
-		logrus.Errorf("Error applying config: %v", err)
+		log.Errorf("Error applying config: %v", err)
 	}
 }
 
@@ -150,7 +151,7 @@ func (p *Provider) applyHaproxyConfig(backends Backends, reload bool) error {
 func (b *haproxyConfigBuilder) exec(cmd string) error {
 	output, err := exec.Command("sh", "-c", cmd).CombinedOutput()
 	msg := fmt.Sprintf("%v -- %v", b.Name, string(output))
-	logrus.Info(msg)
+	log.Info(msg)
 	if err != nil {
 		return fmt.Errorf("error reloading %v: %v", msg, err)
 	}
