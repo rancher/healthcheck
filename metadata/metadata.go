@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/leodotcloud/log"
 	"github.com/rancher/go-rancher-metadata/metadata"
 	"github.com/rancher/healthcheck/types"
 )
@@ -145,7 +145,7 @@ func addServer(c *metadata.Container, servers *[]types.Server, selfHost *metadat
 		}
 	}
 	if skipCheck {
-		logrus.Debugf("Health check for container [%s] is not configured on this host, skipping", c.Name)
+		log.Debugf("Health check for container [%s] is not configured on this host, skipping", c.Name)
 		return
 	}
 

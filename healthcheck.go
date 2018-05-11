@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/leodotcloud/log"
 	"github.com/patrickmn/go-cache"
 	"github.com/rancher/go-rancher/client"
 	"github.com/rancher/healthcheck/metadata"
@@ -80,7 +80,7 @@ func (m *Monitor) readStats(c chan<- haproxy.Stat) {
 		stats, err := h.Stats()
 		currentCount := 0
 		if err != nil {
-			logrus.Errorf("Failed to read stats: %v", err)
+			log.Errorf("Failed to read stats: %v", err)
 			continue
 		}
 
@@ -93,7 +93,7 @@ func (m *Monitor) readStats(c chan<- haproxy.Stat) {
 
 		if currentCount != count {
 			count = currentCount
-			logrus.Infof("Monitoring %d backends", count)
+			log.Infof("Monitoring %d backends", count)
 		}
 
 	}
@@ -117,7 +117,7 @@ func (m *Monitor) processStat(stat haproxy.Stat) {
 	if previousStatus != currentStatus {
 		err := m.reportStatus(serverName, currentStatus)
 		if err != nil {
-			logrus.Errorf("Failed to report status %s=%s: %v", serverName, currentStatus, err)
+			log.Errorf("Failed to report status %s=%s: %v", serverName, currentStatus, err)
 			update = false
 		}
 	}
@@ -138,6 +138,6 @@ func (m *Monitor) reportStatus(serverName, currentStatus string) error {
 		return err
 	}
 
-	logrus.Infof("%s=%s", serverName, currentStatus)
+	log.Infof("%s=%s", serverName, currentStatus)
 	return nil
 }
