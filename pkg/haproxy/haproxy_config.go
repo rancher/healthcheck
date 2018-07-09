@@ -9,8 +9,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/leodotcloud/log"
 	"github.com/rancher/healthcheck/types"
+	"github.com/rancher/log"
 )
 
 type Provider struct {

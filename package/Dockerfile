@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common && \
     add-apt-repository ppa:vbernat/haproxy-1.6 && \
     apt-get update && apt-get install -y haproxy && \
-    curl -sLf https://github.com/leodotcloud/loglevel/releases/download/v0.1/loglevel-amd64-v0.1.tar.gz | tar xvzf - -C /usr/bin
+    curl -sLf https://github.com/rancher/loglevel/releases/download/v0.1/loglevel-amd64-v0.1.tar.gz | tar xvzf - -C /usr/bin
 
 RUN mkdir -p /etc/haproxy/
 COPY healthcheck /usr/bin/

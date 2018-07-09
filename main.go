@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/leodotcloud/log"
-	logserver "github.com/leodotcloud/log/server"
+	"github.com/rancher/log"
+	logserver "github.com/rancher/log/server"
 )
 
 var (
