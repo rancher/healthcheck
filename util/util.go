@@ -3,8 +3,8 @@ package util
 import (
 	"os"
 
-	"github.com/leodotcloud/log"
 	rclient "github.com/rancher/go-rancher/client"
+	"github.com/rancher/log"
 )
 
 func GetRancherClient() (*rclient.RancherClient, error) {

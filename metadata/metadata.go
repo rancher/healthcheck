@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/leodotcloud/log"
 	"github.com/rancher/go-rancher-metadata/metadata"
 	"github.com/rancher/healthcheck/types"
+	"github.com/rancher/log"
 )
 
 type RMetaFetcher struct {

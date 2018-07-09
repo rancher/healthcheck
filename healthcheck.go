@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leodotcloud/log"
 	"github.com/patrickmn/go-cache"
 	"github.com/rancher/go-rancher/client"
 	"github.com/rancher/healthcheck/metadata"
 	"github.com/rancher/healthcheck/pkg/haproxy"
 	"github.com/rancher/healthcheck/util"
+	"github.com/rancher/log"
 )
 
 var Prefix = "cattle-"
