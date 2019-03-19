@@ -10,7 +10,8 @@ reload_haproxy(){
         fi
     fi
     # restart service
-    if haproxy -p /var/run/haproxy.pid -f $1 -sf $(cat /var/run/haproxy.pid); then
+    PIDLIST="$(pgrep -d ' ' -f '/usr/sbin/haproxy\s+-f\s+/etc/haproxy/haproxy.cfg')"
+    if /usr/sbin/haproxy -f $1 -D -p /var/run/haproxy.pid -sf $PIDLIST; then
         return 0
     else
         return 1
